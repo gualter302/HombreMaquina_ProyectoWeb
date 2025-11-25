@@ -27,7 +27,6 @@
       overflow: hidden;
     }
 
-    /* 🔹 Canvas ocupa toda la pantalla */
     #unity-canvas {
       width: 100% !important;
       height: 100% !important;
@@ -35,15 +34,36 @@
       background: #000;
     }
 
-    /* 🔹 Evita que el WebGL se deforme */
     .unity-mobile #unity-canvas {
       width: 100vw !important;
       height: 100vh !important;
+    }
+
+    /* 🔹 Botón fullscreen */
+    #btn-fullscreen {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      z-index: 9999;
+      padding: 12px 20px;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      font-family: sans-serif;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    #btn-fullscreen:hover {
+      background: rgba(255,255,255,0.3);
     }
   </style>
 </head>
 
 <body>
+  <!-- Contenedor responsive -->
   <div id="unity-container">
     <canvas id="unity-canvas"></canvas>
 
@@ -57,11 +77,15 @@
     <div id="unity-warning"></div>
   </div>
 
+  <!-- 🔹 Botón pantalla completa -->
+  <button id="btn-fullscreen">Pantalla completa</button>
+
   <script>
     var container = document.querySelector("#unity-container");
     var canvas = document.querySelector("#unity-canvas");
     var loadingBar = document.querySelector("#unity-loading-bar");
     var progressBarFull = document.querySelector("#unity-progress-bar-full");
+    var btnFullscreen = document.getElementById("btn-fullscreen");
 
     var buildUrl = "Build";
     var loaderUrl = buildUrl + "/WebGLBuild.loader.js";
@@ -83,7 +107,6 @@
       document.head.appendChild(meta);
       container.classList.add("unity-mobile");
 
-      // 🔹 Mejora rendimiento en móviles
       config.devicePixelRatio = 1.0;
     }
 
@@ -91,15 +114,24 @@
 
     var script = document.createElement("script");
     script.src = loaderUrl;
+
     script.onload = () => {
       createUnityInstance(canvas, config, (progress) => {
         progressBarFull.style.width = (progress * 100) + "%";
       }).then((unityInstance) => {
+
         loadingBar.style.display = "none";
+
+        // 🔹 Evento del botón fullscreen
+        btnFullscreen.onclick = () => {
+          unityInstance.SetFullscreen(1);
+        };
+
       }).catch((message) => {
         alert(message);
       });
     };
+
     document.body.appendChild(script);
   </script>
 </body>
